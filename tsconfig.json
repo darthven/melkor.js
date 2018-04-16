@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "module": "esnext",
+    "target": "es5",  
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "moduleResolution": "node",   
+    "lib": [ "es2015", "es2016", "dom" ]
+  },
+  "exclude": [
+    "node_modules",   
+  ]
+}

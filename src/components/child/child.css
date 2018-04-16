@@ -1,0 +1,8 @@
+.child-component {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border: solid 1px lightblue;
+    margin: 5px;
+}

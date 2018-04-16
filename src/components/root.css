@@ -1,0 +1,5 @@
+.root .parent-wrapper {
+    display: flex;
+    flex-direction: row;
+    margin: 7px;
+}

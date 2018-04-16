@@ -1,0 +1,19 @@
+.parent-component {
+    border: solid 1px lightseagreen;
+    margin: 5px;   
+    display: flex;
+    flex-direction: column;
+    align-content: center;
+    justify-content: center;
+}
+
+.parent-component .children-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-content: center;
+    justify-content: center;
+}
+
+.parent-component h3 {
+    text-align: center;
+}
