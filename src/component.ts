@@ -30,25 +30,22 @@ interface VirtualDOM {
 }
 
 const handleVirtualElement = (virtualElement: VirtualElement): VirtualElement => {
-    const children: VirtualElement[] = virtualElement.children
-    if (children && children.length > 0) {
-        children.forEach((child) => {
-            if (child.componentRef) {
-                virtualElement.template.replaceChild(child.template,
-                    virtualElement.template.querySelector(`${child.selector}`))
-            }
-            if (child.children && child.children.length > 0) {
-                handleVirtualElement(child)
-            }
-        })
-    }
+    virtualElement.children.forEach((child) => {
+        const childTemplate = virtualElement.template.querySelector(`${child.selector}`)
+        if (child.componentRef && childTemplate) {
+            virtualElement.template.replaceChild(child.template, childTemplate)
+        }
+    })
     return virtualElement
 }
 
-const registerComponent = (component: Component, components: Map<string, Component>): void => {
+const registerComponent = (componentDefinition: ComponentDefinition, components: Map<string, Component>): void => {
+    const component = componentDefinition()
     components.set(component.selector.toUpperCase(), component)
     if (component.children) {
-        component.children.forEach((child) => registerComponent(child(), components))
+        component.children.forEach((child) => {
+            registerComponent(child, components)
+        })
     }
 }
 
@@ -56,18 +53,18 @@ const getVirtualElement = (element: HTMLElement, components: Map<string, Compone
     const component: Component = components.get(element.tagName)
     if (component) {
         const componentTemplate: HTMLElement = htmlToElement(component.template)
-        return {
+        return handleVirtualElement({
             selector: element.tagName,
             template: componentTemplate,
             children: convertHTMLElementChildren(componentTemplate, components),
             componentRef: component
-        }
+        })
     }
-    return {
+    return handleVirtualElement({
         selector: element.tagName,
         template: element,
         children: convertHTMLElementChildren(element, components)
-    }
+    })
 }
 
 const convertHTMLElementChildren = (element: HTMLElement, components: Map<string, Component>) => {
@@ -100,11 +97,10 @@ const applyStyles = (components: Map<string, Component>) => {
 export const MelkorBootstrapComponent = (definition: ComponentDefinition): void => {
     const components: Map<string, Component> = new Map<string, Component>()
     const rootComponent: Component = definition()
-    registerComponent(rootComponent, components)
+    registerComponent(definition, components)
     const virtualDOM: VirtualDOM = initializeVirtualDOM(rootComponent, components)
     applyStyles(components)
     document.addEventListener("DOMContentLoaded", () => {
-        document.body.replaceChild(handleVirtualElement(virtualDOM.root).template,
-        document.querySelector(`${rootComponent.selector}`))
+        document.body.replaceChild(virtualDOM.root.template, document.querySelector(`${rootComponent.selector}`))
     })
 }
