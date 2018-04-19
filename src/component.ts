@@ -29,14 +29,10 @@ interface VirtualDOM {
     root: VirtualElement
 }
 
-const handleVirtualElement = (virtualElement: VirtualElement): VirtualElement => {
-    virtualElement.children.forEach((child) => {
-        const childTemplate = virtualElement.template.querySelector(`${child.selector}`)
-        if (child.componentRef && childTemplate) {
-            virtualElement.template.replaceChild(child.template, childTemplate)
-        }
-    })
-    return virtualElement
+const htmlToElement = (html: string): HTMLElement => {
+    const template: HTMLTemplateElement = document.createElement("template")
+    template.innerHTML = html
+    return template.content.firstElementChild as HTMLElement
 }
 
 const registerComponent = (componentDefinition: ComponentDefinition, components: Map<string, Component>): void => {
@@ -47,6 +43,20 @@ const registerComponent = (componentDefinition: ComponentDefinition, components:
             registerComponent(child, components)
         })
     }
+}
+
+const handleVirtualElement = (virtualElement: VirtualElement): VirtualElement => {
+    if (virtualElement.children) {
+        virtualElement.children.filter((child) => child.componentRef).forEach((child) => {
+            virtualElement.template.replaceChild(child.template,
+                virtualElement.template.querySelector(`${child.selector}`))
+        })
+    }
+    return virtualElement
+}
+
+const convertHTMLElementChildren = (element: HTMLElement, components: Map<string, Component>) => {
+    return Array.from(element.children).map((child: HTMLElement) => getVirtualElement(child, components))
 }
 
 const getVirtualElement = (element: HTMLElement, components: Map<string, Component>): VirtualElement => {
@@ -67,20 +77,10 @@ const getVirtualElement = (element: HTMLElement, components: Map<string, Compone
     })
 }
 
-const convertHTMLElementChildren = (element: HTMLElement, components: Map<string, Component>) => {
-    return Array.from(element.children).map((child: HTMLElement) => getVirtualElement(child, components))
-}
-
 const initializeVirtualDOM = (rootComponent: Component, components: Map<string, Component>): VirtualDOM => {
     return  {
         root: getVirtualElement(htmlToElement(rootComponent.template), components)
     }
-}
-
-const htmlToElement = (html: string): HTMLElement => {
-    const template: HTMLTemplateElement = document.createElement("template")
-    template.innerHTML = html
-    return template.content.firstElementChild as HTMLElement
 }
 
 const applyStyles = (components: Map<string, Component>) => {

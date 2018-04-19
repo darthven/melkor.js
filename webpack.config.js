@@ -16,6 +16,10 @@ module.exports = {
         test: /\.html$/,
         exclude: /node_modules/,
         use: {loader: 'html-loader'}
+      },
+      {
+        test: /\.css$/,
+        use: [ 'css-loader' ]
       }
     ]
   },
@@ -33,5 +37,10 @@ module.exports = {
   output: {
     filename: 'src/index.js',
     path: path.resolve(__dirname)
+  },
+  devServer: {
+    contentBase: path.join(__dirname, "src"),
+    compress: true,
+    port: 9000
   }
 }
