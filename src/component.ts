@@ -31,7 +31,7 @@ interface VirtualDOM {
 
 const htmlToElement = (html: string): HTMLElement => {
     const template: HTMLElement = document.createElement("div")
-    template.insertAdjacentHTML("afterbegin", html)
+    template.innerHTML = html
     return template.firstElementChild as HTMLElement
 }
 
@@ -88,7 +88,7 @@ const applyStyles = (components: Map<string, Component>) => {
         if (component.styles) {
             const css: HTMLStyleElement = document.createElement("style")
             css.type = "text/css"
-            css.insertAdjacentHTML("beforeend", component.styles)
+            css.innerHTML = component.styles
             document.head.appendChild(css)
         }
     })
