@@ -30,13 +30,13 @@ interface VirtualDOM {
 }
 
 const htmlToElement = (html: string): HTMLElement => {
-    const template: HTMLTemplateElement = document.createElement("template")
-    template.innerHTML = html
-    return template.content.firstElementChild as HTMLElement
+    const template: HTMLElement = document.createElement("div")
+    template.insertAdjacentHTML("afterbegin", html)
+    return template.firstElementChild as HTMLElement
 }
 
 const registerComponent = (componentDefinition: ComponentDefinition, components: Map<string, Component>): void => {
-    const component = componentDefinition()
+    const component: Component = componentDefinition()
     components.set(component.selector.toUpperCase(), component)
     if (component.children) {
         component.children.forEach((child) => {
@@ -88,7 +88,7 @@ const applyStyles = (components: Map<string, Component>) => {
         if (component.styles) {
             const css: HTMLStyleElement = document.createElement("style")
             css.type = "text/css"
-            css.innerHTML = component.styles
+            css.insertAdjacentHTML("beforeend", component.styles)
             document.head.appendChild(css)
         }
     })
@@ -100,7 +100,6 @@ export const MelkorBootstrapComponent = (definition: ComponentDefinition): void 
     registerComponent(definition, components)
     const virtualDOM: VirtualDOM = initializeVirtualDOM(rootComponent, components)
     applyStyles(components)
-    document.addEventListener("DOMContentLoaded", () => {
-        document.body.replaceChild(virtualDOM.root.template, document.querySelector(`${rootComponent.selector}`))
-    })
+    document.addEventListener("DOMContentLoaded", () => document.body.replaceChild(virtualDOM.root.template,
+        document.querySelector(`${rootComponent.selector}`)))
 }
