@@ -29,6 +29,16 @@ interface VirtualDOM {
     root: VirtualElement
 }
 
+const parseProperties = (component: Component): Component => {
+    const properties = component.props;
+    if (properties) {
+        Object.keys(properties).forEach((propName) => {
+            component.template = component.template.replace(`{{${propName}}}`, properties[propName])
+        })
+    }
+    return component
+}
+
 const htmlToElement = (html: string): HTMLElement => {
     const template: HTMLElement = document.createElement("div")
     template.innerHTML = html
@@ -36,7 +46,7 @@ const htmlToElement = (html: string): HTMLElement => {
 }
 
 const registerComponent = (componentDefinition: ComponentDefinition, components: Map<string, Component>): void => {
-    const component: Component = componentDefinition()
+    const component: Component = parseProperties(componentDefinition())
     components.set(component.selector.toUpperCase(), component)
     if (component.children) {
         component.children.forEach((child) => {
